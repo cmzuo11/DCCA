@@ -27,6 +27,14 @@ DCCA network is implemented in Pytorch framework. Please run DCCA on CUDA if pos
 
 * python Main_SNARE_seq.py 
 
+## Useful paramters:
+
+* modify the initial learning rate paramters for each omics data: i.e., lr1 (the default value of flr1 is lr1/10), lr2 (the default value of flr2 is lr2/10);
+
+* use the neural network structure based on your selected variables;
+
+* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf2    indicates the the weights of signal from scRNA-seq data, args.sf3 indicates the the weights of signal from scATAC-seq data.
+
 ## Output:
 
 the output file will be saved for further analysis:
@@ -41,10 +49,6 @@ the output file will be saved for further analysis:
 
 * scATAC-norm.csv: imputated or denoised data for the scATAC-seq (other omics) data.
 
-## useful paramters:
+# Reference:
 
-* modify the initial learning rate paramters for each omics data: i.e., lr1 (the default value of flr1 is lr1/10), lr2 (the default value of flr2 is lr2/10);
-
-* use the neural network structure based on your selected variables;
-
-* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf2    indicates the the weights of signal from scRNA-seq data, args.sf3 indicates the the weights of signal from scATAC-seq data.
+Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data. 2021. (submitted).
