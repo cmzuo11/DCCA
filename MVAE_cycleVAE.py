@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 27 17:00:41 2020
@@ -36,40 +35,6 @@ from utilities import adjust_learning_rate, Z_covariance
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-class VAE_mixture(nn.Module):
-    #def __init__( self, layer_e, hidden1, hidden2, layer_l, layer_d, hidden ):
-    def __init__( self, layer_e, hidden1, Zdim, layer_d, hidden2, 
-                  n_centroids, Type = 'NB', penality = 'Gaussian', 
-                  droprate = 0.1 ):
-
-        super(VAE_mixture, self).__init__()
-        
-        ### the first encoder
-        self.encoder_1   = Encoder_new( layer_e, hidden1, Zdim, droprate = droprate )
-        self.activation  = nn.Softmax(dim=-1)
-
-        ### the decoder
-        if Type == 'ZINB':
-            self.decoder = Decoder_logNorm_ZINB( layer_d, hidden2, layer_e[0], droprate = droprate )
-
-        elif Type == 'NB':
-            self.decoder = Decoder_logNorm_NB( layer_d, hidden2, layer_e[0], droprate = droprate )
-
-        else: ## Bernoulli, or Gaussian
-            self.decoder = Decoder( layer_d, hidden2, layer_e[0], Type, droprate = droprate)
-
-        ### parameters
-        self.Type            = Type
-        self.Zdim            = Zdim
-        self.n_centroids     = n_centroids
-        self.penality        = penality
-
-        self.pi    = nn.Parameter(torch.ones(n_centroids)/n_centroids)  # pc
-        self.mu_c  = nn.Parameter(torch.zeros(Zdim, n_centroids)) # mu
-        self.var_c = nn.Parameter(torch.ones(Zdim, n_centroids)) # sigma^2
-    
-
 
 class VAE(nn.Module):
     #def __init__( self, layer_e, hidden1, hidden2, layer_l, layer_d, hidden ):
