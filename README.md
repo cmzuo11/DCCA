@@ -6,11 +6,11 @@ We proposed DCCA for accurately dissecting the cellular heterogeneity on joint p
 
 DCCA network is implemented in Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or latter, and torch 1.6.0 or latter. 
 
-git clone git://github.com/cmzuo11/DCCA.git
+* git clone git://github.com/cmzuo11/DCCA.git
 
-cd DCCA
+* cd DCCA
 
-python setup.py install
+* python setup.py install
 
 
 # Quick start
@@ -41,7 +41,7 @@ the output file will be saved for further analysis:
 
 * scATAC-norm.csv: imputated or denoised data for the scATAC-seq (other omics) data.
 
-# useful paramters:
+## useful paramters:
 
 * modify the initial learning rate paramters for each omics data: i.e., lr1 (the default value of flr1 is lr1/10), lr2 (the default value of flr2 is lr2/10);
 
