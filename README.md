@@ -51,4 +51,4 @@ the output file will be saved for further analysis:
 
 # Reference:
 
-Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data. 2021. (submitted).
+Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. 2021. (submitted).
