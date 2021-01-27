@@ -28,10 +28,10 @@ from torch.nn import functional as F
 #from sklearn.metrics import jaccard_similarity_score as jsc
 from torch.distributions import Normal, kl_divergence as kl
 
-from layers import build_multi_layers, Encoder, Encoder_new, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
-from loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, poisson_loss, GMM_loss, Encoders_loss_latent, compute_mmd, KL_diver
-from loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis, vae_kl_cost_weight
-from utilities import adjust_learning_rate, Z_covariance
+from DCCA.layers import build_multi_layers, Encoder, Encoder_new, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
+from DCCA.loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, poisson_loss, GMM_loss, Encoders_loss_latent, compute_mmd, KL_diver
+from DCCA.loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis, vae_kl_cost_weight
+from DCCA.utilities import adjust_learning_rate, Z_covariance
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
