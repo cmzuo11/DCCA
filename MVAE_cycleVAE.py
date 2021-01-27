@@ -619,9 +619,9 @@ class scCycle_VAE_old(nn.Module):
 
                         self.model1.fit( train_loader, test_loader, total_loader, self.model2, self.args, self.attention, used_cycle, 0, first, self.attention_loss,self.patttern  )
 
-                    #else:
-                        #if self.patttern == "Both":
-                            #self.model1.fit( train_loader, test_loader, total_loader, self.model2, self.args, self.attention, used_cycle, 1, first, self.attention_loss, self.patttern )
+                    else:
+                        if self.patttern == "Both":
+                            self.model1.fit( train_loader, test_loader, total_loader, self.model2, self.args, self.attention, used_cycle, 1, first, self.attention_loss, self.patttern )
 
                         #else: # only for training atac-seq
                             #self.model1.eval()
@@ -638,7 +638,7 @@ class scCycle_VAE_old(nn.Module):
                             else:
                                 self.model2.init_gmm_params( train_loader, "cpu", "others" )
 
-                        #self.model2.fit( train_loader, test_loader, total_loader, self.model1, self.args, self.attention, used_cycle, 0, first, self.attention_loss, self.patttern )
+                        self.model2.fit( train_loader, test_loader, total_loader, self.model1, self.args, self.attention, used_cycle, 0, first, self.attention_loss, self.patttern )
                         
                         if self.ground_truth is not None:
                             self.evluation_metrics( total_loader )
@@ -647,7 +647,7 @@ class scCycle_VAE_old(nn.Module):
                             self.model2.fit( train_loader, test_loader, total_loader, self.model1, self.args, self.attention, used_cycle, 1, first, self.attention_loss, self.patttern )
 
                     else:
-                        self.model2.fit( train_loader, test_loader, total_loader, self.model1, self.args, Eucli_dis(), used_cycle, 1, first, self.attention_loss,self.patttern  )
+                        self.model2.fit( train_loader, test_loader, total_loader, self.model1, self.args, self.attention, used_cycle, 1, first, self.attention_loss,self.patttern  )
 
             else:
                 if used_cycle % 2 == 0:
