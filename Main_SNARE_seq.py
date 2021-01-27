@@ -28,8 +28,8 @@ def train_with_argas( args ):
     args.lr2        =  0.005
     args.flr2       =  0.0005
 
-    args.workdir  =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/DCCA-main/'
-    args.outdir   =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/DCCA-main/DCCA_out/'
+    args.workdir  =  './Example_test/'
+    args.outdir   =  './Example_test/'
 
     args.File1    =  os.path.join( args.workdir, 'scRNA_seq_SNARE.tsv' ) 
     args.File3    =  os.path.join( args.workdir, 'cell_metadata.txt' ) 
