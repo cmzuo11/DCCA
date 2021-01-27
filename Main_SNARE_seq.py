@@ -12,8 +12,8 @@ import torch
 import torch.utils.data as data_utils
 
 #from MVAE_model import VAE, AE, MVAE_POE
-from utilities import read_dataset, normalize, parameter_setting
-from MVAE_cycleVAE import DCCA
+from DCCA.utilities import read_dataset, normalize, parameter_setting
+from DCCA.MVAE_cycleVAE import DCCA
 
 def train_with_argas( args ):
 
