@@ -17,11 +17,11 @@ python setup.py install
 
 ## Input: 
 
-> the raw count data of scRNA-seq and scMethylation data (i.e., binary scATAC-seq data). 
+* the raw count data of scRNA-seq and scMethylation data (i.e., binary scATAC-seq data). 
 
-> Row indicates variable (genes and loci), and column indicates sample (cell).
+* Row indicates variable (genes and loci), and column indicates sample (cell).
 
-> the example files for both omics data are included in the Example_test folder.
+* the example files for both omics data are included in the Example_test folder.
 
 ## Run: 
 
