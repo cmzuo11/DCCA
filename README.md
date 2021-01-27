@@ -6,10 +6,13 @@ We proposed DCCA for accurately dissecting the cellular heterogeneity on joint p
 # Installation
 
 DCCA network is implemented in Pytorch framework. Please run DCCA on CUDA if possible. 
+
 DCCA requires python 3.6.12 or latter, and torch 1.6.0 or latter. 
 
 git clone git://github.com/cmzuo11/DCCA.git
+
 cd DCCA
+
 python setup.py install
 
 
