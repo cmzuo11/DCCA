@@ -51,11 +51,12 @@ the output file will be saved for further analysis:
 
 ## Further analysis:
 
-The detailed function (at ./DCCA/Processing_data.R) for how to anlayze single-cell multi-omics data as follows:
+The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze single-cell multi-omics data as follows:
 
 * Select_Loci_by_vargenes: select the genomics loci based on predefined genes;
 * Plot_umap_embeddings: plot cell embeddings based on each latent feature for each omics data;
-* Calculate_TF_score: calcucate the TF score for each cell based on your input data;
+* Calculate_TF_score: calcucate the TF score for each cell based on input scATAC-seq data;
+* Infer_network: infer TF-TG relationship based on two-omics data;
 * ...
 
 # Reference:
