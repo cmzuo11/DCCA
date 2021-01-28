@@ -43,9 +43,9 @@ the output file will be saved for further analysis:
 
 * model_DCCA.pt: saved model for reproducing results.
 
-* scRNA-latent.csv: latent features (joint-learning space) for scRNA-seq data for clustering and visulization.
+* scRNA-latent.csv: latent features (Zx, joint-learning space) for scRNA-seq data for clustering and visulization.
 
-* scATAC-latent.csv: latent features for scATAC-seq (or other omics) data for clustering and visulization.
+* scATAC-latent.csv: latent features (Zy) for scATAC-seq (or other omics) data for clustering and visulization.
 
 * scRNA-norm.csv: normalized data for the scRNA-seq data.
 
