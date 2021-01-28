@@ -1,2 +1,2 @@
 
-# Example test file
+Example test file
