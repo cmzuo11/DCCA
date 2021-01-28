@@ -61,6 +61,8 @@ The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze si
 * Infer_network: infer TF-TG relationship based on two-omics data;
 * ...
 
+[Tutorial](https://github.com/cmzuo11/DCCA/wiki/Tutorial)
+
 # Reference:
 
 Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. 2021. (submitted).
