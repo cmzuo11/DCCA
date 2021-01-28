@@ -21,7 +21,7 @@ def train_with_argas( args ):
     args.epoch_per_test = 10
     args.use_cuda       =  args.use_cuda and torch.cuda.is_available()
 
-    args.sf2        =  args.sf3 = 2
+    args.sf1        =  args.sf2 = 2
     args.cluster1   =  args.cluster2   =  4
     args.lr1        =  0.01
     args.flr1       =  0.001
