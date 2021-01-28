@@ -29,11 +29,11 @@ DCCA is implemented in Pytorch framework. Please run DCCA on CUDA if possible. D
 
 ## Useful paramters:
 
-* modify the initial learning rate paramters for each omics data: i.e., lr1 (the default value of flr1 is lr1/10), lr2 (the default value of flr2 is lr2/10);
+* modify the initial learning rate paramters for each omics data: i.e., lr1 for one omics (i.e., scRNA-seq, default value is 0.01), lr2 for another omics (i.e., scATAC-seq, default value is 0.002);
 
-* use the neural network structure based on your selected variables;
+* modify the neural network structure based on your selected variables;
 
-* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf2    indicates the the weights of signal from scRNA-seq data, args.sf3 indicates the the weights of signal from scATAC-seq data.
+* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weights of signal from scRNA-seq data, args.sf2 indicates the the weights of signal from scATAC-seq data. the default value for two parameter is 2. you can adjust them from 1 to 10 by 1.
 
 ## Output:
 
