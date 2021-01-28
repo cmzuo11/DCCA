@@ -1,6 +1,6 @@
 # Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data.
 
-![Image text](https://https://github.com/cmzuo11/DCCA/tree/main/Example_test/Main_figure.png)
+![Image text](https://github.com/cmzuo11/DCCA/blob/main/Example_test/Main_figure.png)
 
 We proposed DCCA for accurately dissecting the cellular heterogeneity on joint profiling multi-omics data from the same individual cell by transferring representation between each other. 
 
