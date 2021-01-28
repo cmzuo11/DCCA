@@ -1,7 +1,3 @@
-# File
+File: Example test
 
-## Example test file
-
-# Processing data Rscript
-
-## Processing_data.R
+Processing Rscript: Processing_data.R
