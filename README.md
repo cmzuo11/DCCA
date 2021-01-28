@@ -4,7 +4,7 @@ We proposed DCCA for accurately dissecting the cellular heterogeneity on joint p
 
 # Installation
 
-DCCA is implemented in Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or latter, and torch 1.6.0 or latter. 
+DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or later, and torch 1.6.0 or later. The used packages (described by "used_package.txt") for DCCA can be automatically installed.
 
 * git clone git://github.com/cmzuo11/DCCA.git
 
@@ -31,9 +31,9 @@ DCCA is implemented in Pytorch framework. Please run DCCA on CUDA if possible. D
 
 * modify the initial learning rate paramters for each omics data: i.e., lr1 for one omics (i.e., scRNA-seq, default value is 0.01), lr2 for another omics (i.e., scATAC-seq, default value is 0.002);
 
-* modify the neural network structure based on your selected variables;
+* modify the neural network structure based on the number of selected variables;
 
-* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weights of signal from scRNA-seq data, args.sf2 indicates the the weights of signal from scATAC-seq data. the default value for two parameter is 2. you can adjust them from 1 to 10 by 1.
+* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weight of signal from scRNA-seq data, args.sf2 indicates the the weight of signal from scATAC-seq data. the default value for two parameters is 2. you can adjust them from 1 to 10 by 1.
 
 ## Output:
 
