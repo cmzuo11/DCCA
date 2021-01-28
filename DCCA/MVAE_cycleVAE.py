@@ -329,7 +329,7 @@ class VAE(nn.Module):
                         if state == 0 :
                             # for initialization of scRNA-seq model
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                size_factor1, criterion, attention_loss)
+                                                                                          size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1  + (kl_weight * kl_divergence_z)  )
 
                         else:
@@ -342,13 +342,13 @@ class VAE(nn.Module):
 
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
                                                                                           size_factor1, criterion, attention_loss)
-                            loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf3 * (atten_loss1) ) ) 
+                            loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
                     
                     else:
                         if state == 0 :
                             # for initialization of other omics model
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None,  None, None, 
-                                                                                size_factor2, criterion, attention_loss)
+                                                                                          size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1  + (kl_weight * kl_divergence_z)  ) 
 
                         else:
@@ -361,7 +361,7 @@ class VAE(nn.Module):
 
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
                                                                                           size_factor2, criterion, attention_loss)
-                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
+                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf1 * (atten_loss1) ) )
 
                 else:
 
@@ -370,7 +370,7 @@ class VAE(nn.Module):
                         if state == 0 :
                             # for initialization of other omics model
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                size_factor2, criterion, attention_loss)
+                                                                                          size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  )
 
                         else:
@@ -383,13 +383,13 @@ class VAE(nn.Module):
 
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
                                                                                           size_factor2, criterion, attention_loss)
-                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
+                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf1 * (atten_loss1) ) ) 
                     
                     else:
                         if state == 0 :
                             # for initialization of scRNA-seq model
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                size_factor1, criterion, attention_loss)
+                                                                                          size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                         else:
@@ -402,7 +402,7 @@ class VAE(nn.Module):
 
                             loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
                                                                                           size_factor1, criterion, attention_loss)
-                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf3 * (atten_loss1) ) )
+                            loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
 
                 loss.backward()
                 optimizer.step()
@@ -426,7 +426,7 @@ class VAE(nn.Module):
                             if cycle%2 == 0:
                                 if state == 0 :
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                        size_factor1, criterion, attention_loss)
+                                                                                                  size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z)  )
 
                                 else:
@@ -438,12 +438,12 @@ class VAE(nn.Module):
 
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
                                                                                                   size_factor1, criterion, attention_loss)
-                                    test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf3 * (atten_loss1) ) ) 
+                                    test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
 
                             else:
                                 if state == 0 :
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                        size_factor2, criterion, attention_loss)
+                                                                                                  size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                                 else:
@@ -455,14 +455,14 @@ class VAE(nn.Module):
 
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
                                                                                                   size_factor2, criterion, attention_loss)
-                                    test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
+                                    test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf1 * (atten_loss1) ) )
 
                         else:
                             if cycle%2 == 0:
 
                                 if state == 0 :
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                        size_factor2, criterion, attention_loss)
+                                                                                                  size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  )
 
                                 else:
@@ -474,12 +474,12 @@ class VAE(nn.Module):
 
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
                                                                                                   size_factor2, criterion, attention_loss)
-                                    test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
+                                    test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf1 * (atten_loss1) ) ) 
 
                             else:
                                 if state == 0 :
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                        size_factor1, criterion, attention_loss)
+                                                                                                  size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                                 else:
@@ -491,7 +491,7 @@ class VAE(nn.Module):
 
                                     loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
                                                                                                   size_factor1, criterion, attention_loss)
-                                    test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z)  + (args.sf3 * (atten_loss1) ) )
+                                    test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
 
                         train_loss_list.append( test_loss.item() )
 
