@@ -42,28 +42,19 @@ def parameter_setting():
 
     parser.add_argument('--File3', '-F3', type=str, default = '5-cellinfo-RNA.tsv',  help='input meta file')
     parser.add_argument('--File_combine', '-F_com', type=str, default = 'Gene_chromatin_order_combine.tsv',    help='input combine file name')
-    parser.add_argument('--File_mofa', '-F_mofa', type=str, default = 'MOFA_combine_cluster.csv',    help='cluster for mofa predicted')
-    
-    parser.add_argument('--latent_fusion', '-olf1', type=str, default = 'First_simulate_fusion.csv',    help='fusion latent code file')
-    parser.add_argument('--latent_1', '-ol1', type=str, default = 'scRNA_latent_combine.csv',    help='first latent code file')
-    parser.add_argument('--latent_2', '-ol2', type=str, default = 'scATAC_latent.csv',    help='seconde latent code file')
-    parser.add_argument('--denoised_1', '-od1', type=str, default = 'scRNA_seq_denoised.csv', help='outfile for denoised file1')
-    parser.add_argument('--normalized_1', '-on1', type=str, default = 'scRNA_seq_normalized_combine.tsv',  help='outfile for normalized file1')
-    parser.add_argument('--denoised_2', '-od2', type=str, default = 'scATAC_seq_denoised.csv',  help='outfile for denoised file2')
     
     parser.add_argument('--workdir', '-wk', type=str, default = outPath, help='work path')
     parser.add_argument('--outdir', '-od', type=str, default = outPath, help='Output path')
     
     parser.add_argument('--lr1', type=float, default = 0.01, help='Learning rate1')
     parser.add_argument('--flr1', type=float, default = 0.001, help='Final learning rate1')
-    parser.add_argument('--lr2', type=float, default = 0.005, help='Learning rate2')
-    parser.add_argument('--flr2', type=float, default = 0.0005, help='Final learning rate2')
+    parser.add_argument('--lr2', type=float, default = 0.002, help='Learning rate2')
+    parser.add_argument('--flr2', type=float, default = 0.0002, help='Final learning rate2')
     parser.add_argument('--weight_decay', type=float, default = 1e-6, help='weight decay')
     parser.add_argument('--eps', type=float, default = 0.01, help='eps')
 
-    parser.add_argument('--sf1', type=float, default = 1.0, help='scale_factor_1')
-    parser.add_argument('--sf2', type=float, default = 2.0, help='scale_factor_2')
-    parser.add_argument('--sf3', type=float, default = 2.0, help='scale_factor_3 for attention loss')
+    parser.add_argument('--sf1', type=float, default = 2.0, help='scale_factor_1 for supervision signal from scRNA-seq')
+    parser.add_argument('--sf2', type=float, default = 2.0, help='scale_factor_2 for supervision signal from scEpigenomics')
     parser.add_argument('--cluster1', '-clu1', type=int, default=2, help='predefined cluster for scRNA')
     parser.add_argument('--cluster2', '-clu2', type=int, default=2, help='predefined cluster for other epigenomics')
     parser.add_argument('--geneClu', '-gClu', type=list, default = None, help='predefined gene cluster for scRNA')
@@ -76,7 +67,7 @@ def parameter_setting():
     parser.add_argument('--max_epoch', '-me', type=int, default=500, help='Max epoches')
     parser.add_argument('--max_iteration', '-mi', type=int, default=3000, help='Max iteration')
     parser.add_argument('--anneal_epoch', '-ae', type=int, default=200, help='Anneal epoch')
-    parser.add_argument('--epoch_per_test', '-ept', type=int, default=5, help='Epoch per test')
+    parser.add_argument('--epoch_per_test', '-ept', type=int, default=10, help='Epoch per test')
     parser.add_argument('--max_ARI', '-ma', type=int, default=-200, help='initial ARI')
     
     return parser
