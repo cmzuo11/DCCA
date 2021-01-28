@@ -56,8 +56,7 @@ The detailed function (at ./DCCA/Processing_data.R) for how to anlayze single-ce
 * Select_Loci_by_vargenes: select the genomics loci based on predefined genes;
 * Plot_umap_embeddings: plot cell embeddings based on each latent feature for each omics data;
 * Calculate_TF_score: calcucate the TF score for each cell based on your input data;
-
-...
+* ...
 
 # Reference:
 
