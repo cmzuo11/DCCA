@@ -49,6 +49,15 @@ the output file will be saved for further analysis:
 
 * scATAC-norm.csv: imputated or denoised data for the scATAC-seq (other omics) data.
 
+## Further analysis:
+
+The detailed function (at ./DCCA/Processing_data.R) for how to anlayze single-cell multi-omics data as follows:
+
+* Select_Loci_by_vargenes: select the genomics loci based on predefined genes;
+* Plot_umap_embeddings: plot cell embeddings based on each latent feature for each omics data;
+* Calculate_TF_score: calcucate the TF score for each cell based on your input data.
+...
+
 # Reference:
 
 Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. 2021. (submitted).
