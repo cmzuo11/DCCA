@@ -98,7 +98,7 @@ plot_umap_embeddings <- function(File_latent_rna, File_latent_atac, File_cellMet
 }
 
 #2. calculate TF score for scATAC-seq data
-Calculate_TF_score <- function( input_file, input_cellMeta, out_file, cell_meta = NULL, species = "mouse"){
+Calculate_TF_score <- function( input_file, input_cellMeta, out_file, species = "mouse"){
   #input_file indicates "./Example_test/scATAC-norm.csv"
   #input_cellMeta indicates "./Example_test/cell_metadata.txt"
   #out_file indicates "./Example_test/atac_denoise_deviation.txt"
