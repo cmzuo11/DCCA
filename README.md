@@ -1,9 +1,5 @@
 # Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data.
 
-![Image text](https://github.com/cmzuo11/DCCA/blob/main/Example_test/Main_figure.png)
-
-We proposed DCCA for accurately dissecting the cellular heterogeneity on joint profiling multi-omics data from the same individual cell by transferring representation between each other. 
-
 # Installation
 
 DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or later, and torch 1.6.0 or later. The used packages (described by "used_package.txt") for DCCA can be automatically installed.
