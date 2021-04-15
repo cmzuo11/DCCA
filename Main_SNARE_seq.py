@@ -24,11 +24,12 @@ def train_with_argas( args ):
     args.cluster1   =  args.cluster2   =  4
     args.lr1        =  0.01
     args.flr1       =  0.001
-    args.lr2        =  0.002
-    args.flr2       =  0.0002
+    args.lr2        =  0.005
+    args.flr2       =  0.0005
 
     args.workdir    =  './Example_test/'
     args.outdir     =  './Example_test/'
+    model_file      =  os.path.join( args.outdir, 'model_DCCA.pth.tar' )
 
     args.File1      =  os.path.join( args.workdir, 'scRNA_seq_SNARE.tsv' )
     args.File2      =  os.path.join( args.workdir, 'scATAC_seq_SNARE.txt' ) 
@@ -88,26 +89,31 @@ def train_with_argas( args ):
 
     NMI_score1, ARI_score1, NMI_score2, ARI_score2  =  model.fit_model(train_loader, test_loader, total_loader, "RNA" )
 
-    save_checkpoint(model, 'model_DCCA.pth.tar') 
+    save_checkpoint(model, model_file ) 
 
-    #model_new = load_checkpoint('./saved_model/model_DCCA.pth.tar' , model, args.use_cuda)
+    #cluster_rna, cluster_epi = model.predict_cluster_by_kmeans(total_loader)
+
+    #model_new = load_checkpoint( model_file , model, args.use_cuda )
     #latent_z1, latent_z2, norm_x1, _, norm_x2, _ = model_new( total_loader )
 
     latent_z1, latent_z2, norm_x1, _, norm_x2, _ = model( total_loader )
 
     if latent_z1 is not None:
-        imputed_val  = pd.DataFrame( latent_z1, index= adata.obs_names ).to_csv( os.path.join( args.outdir, 'scRNA-latent.csv' ) ) 
+        pd.DataFrame( latent_z1, index= adata.obs_names ).to_csv( os.path.join( args.outdir, 'scRNA-latent.csv' ) ) 
 
     if norm_x1 is not None:
-        norm_x1_1    = pd.DataFrame( norm_x1, columns =  adata.var_names, 
-                                     index= adata.obs_names ).to_csv( os.path.join( args.outdir, 'scRNA-norm.csv' ) )
+        pd.DataFrame( norm_x1, columns =  adata.var_names, 
+                      index= adata.obs_names ).to_csv( os.path.join( args.outdir, 'scRNA-norm.csv' ) )
 
     if latent_z2 is not None:
-        imputed_val  = pd.DataFrame( latent_z2, index= adata1.obs_names ).to_csv( os.path.join( args.outdir, 'scATAC-latent.csv' ) ) 
+        pd.DataFrame( latent_z2, index= adata1.obs_names ).to_csv( os.path.join( args.outdir, 'scATAC-latent.csv' ) ) 
 
     if norm_x2 is not None:
-        norm_x1_1    = pd.DataFrame( norm_x2, columns =  adata1.var_names, 
-                                     index= adata1.obs_names ).to_csv( os.path.join( args.outdir, 'scATAC-norm.csv' ) )
+        pd.DataFrame( norm_x2, columns =  adata1.var_names, 
+                      index= adata1.obs_names ).to_csv( os.path.join( args.outdir, 'scATAC-norm.csv' ) )
+
+    #pd.DataFrame( cluster_rna, index= adata.obs_names ).to_csv( os.path.join( args.outdir, 'scRNA_cluster_by_Kmeans.csv' ) )
+    #pd.DataFrame( cluster_epi, index= adata1.obs_names ).to_csv( os.path.join( args.outdir, 'scEpi_cluster_by_Kmeans.csv' ) )
 
 if __name__ == "__main__":
 
