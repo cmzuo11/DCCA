@@ -45,7 +45,7 @@ the output file will be saved for further analysis:
 
 * scRNA-latent.csv: latent features (Zx, joint-learning space) for scRNA-seq data for clustering and visulization.
 
-* scATAC-latent.csv: latent features (Zy) for scATAC-seq (or other omics) data for clustering and visulization.
+* scATAC-latent.csv: latent features (Zy) for scEpigenomics data (including scATAC-seq and scMethylation data) for clustering and visulization.
 
 * scRNA-norm.csv: normalized data for the scRNA-seq data.
 
