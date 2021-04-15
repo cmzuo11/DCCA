@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jul 27 17:00:41 2020
-
 @author: chunmanzuo
 """
 
@@ -11,6 +10,7 @@ import os
 import time
 import math
 import torch.utils.data as data_utils
+
 from torch.autograd import Variable
 from torch import optim
 from sklearn.cluster import KMeans
@@ -18,20 +18,17 @@ from sklearn import metrics
 from sklearn.metrics import cohen_kappa_score
 from sklearn.metrics.cluster import normalized_mutual_info_score
 from sklearn.mixture import GaussianMixture
-
 from collections import OrderedDict
 
 import torch
 from torch import nn
 from torch.nn import functional as F
-
-#from sklearn.metrics import jaccard_similarity_score as jsc
 from torch.distributions import Normal, kl_divergence as kl
 
-from DCCA.layers import build_multi_layers, Encoder, Encoder_new, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
-from DCCA.loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, poisson_loss, GMM_loss, Encoders_loss_latent, compute_mmd, KL_diver
-from DCCA.loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis, vae_kl_cost_weight
-from DCCA.utilities import adjust_learning_rate, Z_covariance
+from DCCA.layers import Encoder, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
+from DCCA.loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, KL_diver
+from DCCA.loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis, L1_dis
+from DCCA.utilities import adjust_learning_rate
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -44,8 +41,8 @@ class VAE(nn.Module):
 
         super(VAE, self).__init__()
         
-        ### the first encoder
-        self.encoder_1   = Encoder_new( layer_e, hidden1, Zdim, droprate = droprate )
+        ###  encoder
+        self.encoder     = Encoder( layer_e, hidden1, Zdim, droprate = droprate )
         self.activation  = nn.Softmax(dim=-1)
 
         ### the decoder
@@ -60,17 +57,11 @@ class VAE(nn.Module):
 
         ### parameters
         self.Type            = Type
-        self.Zdim            = Zdim
-        self.n_centroids     = n_centroids
         self.penality        = penality
-
-        self.pi    = nn.Parameter(torch.ones(n_centroids)/n_centroids)  # pc
-        self.mu_c  = nn.Parameter(torch.zeros(Zdim, n_centroids)) # mu
-        self.var_c = nn.Parameter(torch.ones(Zdim, n_centroids)) # sigma^2
     
     def inference(self, X = None, scale_factor = 1.0):
-        # the first encoder
-        mean_1, logvar_1, latent_1, hidden = self.encoder_1.return_all_params( X )
+        # encoder
+        mean_1, logvar_1, latent_1, hidden = self.encoder.return_all_params( X )
         
         ### decoder
         if self.Type == 'ZINB' :
@@ -94,101 +85,15 @@ class VAE(nn.Module):
             disper_x      =  None
             dropout_rate  =  None
 
-        ## the second encoder
-        mean_2, logvar_2, latent_2 = None, None, None
-        
-        return dict( norm_x   = norm_x, disper_x   = disper_x, dropout_rate = dropout_rate,
-                     recon_x  = recon_x, latent_z1 = latent_1, latent_z2    = latent_2,
-                     mean_1   =  mean_1, logvar_1  = logvar_1, mean_2       =  mean_2,
-                     logvar_2 =  logvar_2, hidden  = hidden
+        return dict( norm_x   = norm_x,  disper_x   = disper_x,  dropout_rate  = dropout_rate,
+                     recon_x  = recon_x, latent_z1  = latent_1,  mean_1        = mean_1,  
+                     logvar_1 = logvar_1,  hidden   = hidden
                     )
 
-    def get_gamma(self, z):
-        
-        n_centroids = self.n_centroids
 
-        N     =  z.size(0)
-        z     =  z.unsqueeze(2).expand(z.size(0), z.size(1), n_centroids)
-        pi    =  self.pi.repeat(N,1) # NxK
-        mu_c  =  self.mu_c.repeat(N,1,1) # NxDxK
-        var_c =  self.var_c.repeat(N,1,1) # NxDxK
-
-        # p(c,z) = p(c)*p(z|c) as p_c_z
-        p_c_z = torch.exp(torch.log(pi) - torch.sum(0.5*torch.log(2*math.pi*var_c) + (z-mu_c)**2/(2*var_c), dim=1)) + 1e-10
-        gamma = p_c_z / torch.sum(p_c_z, dim=1, keepdim=True)
-
-        return gamma, mu_c, var_c, pi
-
-    def out_Batch(self, Dataloader, device, out='RNA'):
-        output = []
-
-        for i, (X1, _, _, X2, _, _) in enumerate(Dataloader):
-
-            if out == 'RNA':
-                temp_X = X1.view(X1.size(0), -1).float().to(device)
-            
-            else:
-                temp_X = X2.view(X2.size(0), -1).float().to(device)
-                 
-            _, _, latent_1 = self.encoder_1.return_all_params( temp_X )
-
-            output.append(latent_1.detach().cpu())
-
-        output = torch.cat(output).numpy()
-
-        return output
-
-    def out_Batch_single(self, Dataloader, device):
-        output = []
-
-        for i, (X1, _, _) in enumerate(Dataloader):
-
-            temp_X         = X1.view(X1.size(0), -1).float().to(device)
-            _, _, latent_1 = self.encoder_1.return_all_params( temp_X )
-
-            output.append(latent_1.detach().cpu())
-
-        output = torch.cat(output).numpy()
-
-        return output
-
-    def encodeBatch_out(self, total_loader):
-        latent_z1 = []
-        norm_x1   = []
-        recon_x1  = []
-
-        for batch_idx, ( X1, _, size_factor1 ) in enumerate(total_loader): 
-            X1, size_factor1 = X1.cuda(), size_factor1.cuda()
-            X1, size_factor1 = Variable( X1 ), Variable( size_factor1 )
-
-            result1  = self.inference( X1, size_factor1 )
-            latent_z1.append( result1["latent_z1"].data.cpu().numpy() )
-            norm_x1.append( result1["norm_x"].data.cpu().numpy() )
-            recon_x1.append( result1["recon_x"].data.cpu().numpy() )
-
-        latent_z1 = np.concatenate(latent_z1)
-        norm_x1   = np.concatenate(norm_x1)
-        recon_x1  = np.concatenate(recon_x1)
-
-        return latent_z1, norm_x1, recon_x1
-
-    def init_gmm_params(self, Dataloader, device, out, modality = 'single'):
-
-        gmm = GaussianMixture(n_components=self.n_centroids, covariance_type='diag')
-
-        if modality == 'single':
-            latent_z  =  self.out_Batch_single(Dataloader, device )
-        else:
-            latent_z  =  self.out_Batch(Dataloader, device, out=out )
-
-        gmm.fit(latent_z)
-
-        self.mu_c.data.copy_(torch.from_numpy(gmm.means_.T.astype(np.float32)))
-        self.var_c.data.copy_(torch.from_numpy(gmm.covariances_.T.astype(np.float32)))
-
-    def return_loss(self, X = None, X_raw = None, latent_pre = None, mean_pre = None, logvar_pre = None, 
-                    latent_pre_hidden = None, scale_factor = 1.0, cretion_loss = None,
-                    attention_loss = None ):
+    def return_loss(self, X      = None, X_raw       = None, latent_pre        = None, 
+                    mean_pre     = None, logvar_pre  = None, latent_pre_hidden = None, 
+                    scale_factor = 1.0, cretion_loss = None, attention_loss    = None ):
 
         output       = self.inference( X, scale_factor )
         recon_x      = output["recon_x"]
@@ -213,69 +118,28 @@ class VAE(nn.Module):
         else:
             loss = mse_loss( X, recon_x )
 
-        if self.penality == "GMM" :
-            gamma, mu_c, var_c, pi =  self.get_gamma(latent_z1) #, self.n_centroids, c_params)
-            kl_divergence_z        =  GMM_loss( gamma, (mu_c, var_c, pi), (mean_1, logvar_1) )
+        ##calculate KL loss for Gaussian distribution
+        mean             =  torch.zeros_like(mean_1)
+        scale            =  torch.ones_like(logvar_1)
+        kl_divergence_z  =  kl( Normal(mean_1, logvar_1), 
+                                Normal(mean, scale)).sum(dim=1)
 
-        else:
-            ##calculate KL loss for naive bayesian
-            mean             =  torch.zeros_like(mean_1)
-            scale            =  torch.ones_like(logvar_1)
-            kl_divergence_z  =  kl( Normal(mean_1, logvar_1), 
-                                    Normal(mean, scale)).sum(dim=1)
-
+        atten_loss1 = torch.tensor(0.0)
         if latent_pre is not None and latent_pre_hidden is not None:
 
             if attention_loss == "KL_div":
                 atten_loss1 = cretion_loss( mean_1, logvar_1, mean_pre, logvar_pre )
-                atten_loss2 = torch.tensor(0.0)
 
             else:
                 atten_loss1 = cretion_loss(latent_z1, latent_pre)
-                atten_loss2 = torch.tensor(0.0)
 
-        else:
-            atten_loss1 = torch.tensor(0.0)
-            atten_loss2 = torch.tensor(0.0)
-
-        return loss, torch.tensor(0.0), kl_divergence_z, atten_loss1, torch.tensor(0.0)
+        return loss, kl_divergence_z, atten_loss1
 
         
     def forward( self, X = None, scale_factor = 1.0 ):
 
         output =  self.inference( X, scale_factor )
 
-        return output
-
-    def predict(self, dataloader, args, out='z' ):
-        
-        output = []
-
-        for batch_idx, ( X, X_raw, size_factor ) in enumerate(dataloader):
-
-            if args.use_cuda:
-                X, X_raw    = X.cuda(), X_raw.cuda()
-                size_factor = size_factor.cuda()
-
-            X           = Variable( X )
-            X_raw       = Variable( X_raw )
-            size_factor = Variable(size_factor)
-
-            result      = self.inference( X, size_factor)
-
-            if out == 'z': # the z1
-                output.append( result["latent_z1"].detach().cpu() )
-
-            elif out == 'recon_x':
-                output.append( result["recon_x"].detach().cpu().data )
-
-            elif out == 'norm_x':
-                output.append( result["norm_x"].detach().cpu().data )
-
-            else: # z2
-                output.append( result["latent_z2"].detach().cpu() )
-
-        output = torch.cat(output).numpy()
         return output
 
     def fit( self, train_loader, test_loader, total_loader, model_pre, args, criterion, cycle, state, first = "RNA", attention_loss = "Eucli" ):
@@ -327,40 +191,40 @@ class VAE(nn.Module):
                     if cycle%2 == 0:
 
                         if state == 0 :
-                            # for initialization of scRNA-seq model
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                          size_factor1, criterion, attention_loss)
+                            # initialization of scRNA-seq model
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, None, None, None, None, 
+                                                                                    size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1  + (kl_weight * kl_divergence_z)  )
 
                         else:
-                            #transfer representation
+                            #transfer representation from scEpigenomics model to scRNA-seq model
                             result_2  = model_pre( X2, size_factor2)
                             latent_z1 = result_2["latent_z1"].to("cuda:0")
                             hidden_1  = result_2["hidden"].to("cuda:0")
                             mean_1    = result_2["mean_1"].to("cuda:0")
                             logvar_1  = result_2["logvar_1"].to("cuda:0")
 
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
-                                                                                          size_factor1, criterion, attention_loss)
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
+                                                                                    size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
                     
                     else:
                         if state == 0 :
-                            # for initialization of other omics model
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None,  None, None, 
-                                                                                          size_factor2, criterion, attention_loss)
+                            # initialization of scEpigenomics model
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, None, None,  None, None, 
+                                                                                    size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1  + (kl_weight * kl_divergence_z)  ) 
 
                         else:
-                            #transfer representation
+                            #transfer representation form scRNA-seq model to scEpigenomics model
                             result_2  = model_pre( X1, size_factor1)
                             latent_z1 = result_2["latent_z1"].to("cuda:1")
                             hidden_1  = result_2["hidden"].to("cuda:1")
                             mean_1    = result_2["mean_1"].to("cuda:1")
                             logvar_1  = result_2["logvar_1"].to("cuda:1")
 
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
-                                                                                          size_factor2, criterion, attention_loss)
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
+                                                                                    size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf1 * (atten_loss1) ) )
 
                 else:
@@ -368,40 +232,40 @@ class VAE(nn.Module):
                     if cycle%2 == 0:
 
                         if state == 0 :
-                            # for initialization of other omics model
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                          size_factor2, criterion, attention_loss)
+                            # initialization of scEpigenomics model
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, None, None, None, None, 
+                                                                                    size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  )
 
                         else:
-                            #transfer representation
+                            #transfer representation from scRNA-seq model to scEpigenomics model
                             result_2  = model_pre( X1, size_factor1)
                             latent_z1 = result_2["latent_z1"].to("cuda:1")
                             hidden_1  = result_2["hidden"].to("cuda:1")
                             mean_1    = result_2["mean_1"].to("cuda:1")
                             logvar_1  = result_2["logvar_1"].to("cuda:1")
 
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
-                                                                                          size_factor2, criterion, attention_loss)
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
+                                                                                    size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf1 * (atten_loss1) ) ) 
                     
                     else:
                         if state == 0 :
-                            # for initialization of scRNA-seq model
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                          size_factor1, criterion, attention_loss)
+                            # initialization of scRNA-seq model
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, None, None, None, None, 
+                                                                                    size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                         else:
-                            #transfer representation
+                            #transfer representation from scEpigenomics model to scRNA-seq model
                             result_2  = model_pre( X2, size_factor2)
                             latent_z1 = result_2["latent_z1"].to("cuda:0")
                             hidden_1  = result_2["hidden"].to("cuda:0")
                             mean_1    = result_2["mean_1"].to("cuda:0")
                             logvar_1  = result_2["logvar_1"].to("cuda:0")
 
-                            loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
-                                                                                          size_factor1, criterion, attention_loss)
+                            loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
+                                                                                    size_factor1, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
 
                 loss.backward()
@@ -425,8 +289,8 @@ class VAE(nn.Module):
 
                             if cycle%2 == 0:
                                 if state == 0 :
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                                  size_factor1, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, None, None, None, None, 
+                                                                                            size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z)  )
 
                                 else:
@@ -436,14 +300,14 @@ class VAE(nn.Module):
                                     mean_1    = result_2["mean_1"].to("cuda:0")
                                     logvar_1  = result_2["logvar_1"].to("cuda:0")
 
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
-                                                                                                  size_factor1, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1,
+                                                                                            size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z) + (args.sf2 * (atten_loss1) ) ) 
 
                             else:
                                 if state == 0 :
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                                  size_factor2, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, None, None, None, None, 
+                                                                                            size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                                 else:
@@ -453,16 +317,16 @@ class VAE(nn.Module):
                                     mean_1    = result_2["mean_1"].to("cuda:1")
                                     logvar_1  = result_2["logvar_1"].to("cuda:1")
 
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
-                                                                                                  size_factor2, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
+                                                                                            size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf1 * (atten_loss1) ) )
 
                         else:
                             if cycle%2 == 0:
 
                                 if state == 0 :
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, None, None, None, None, 
-                                                                                                  size_factor2, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, None, None, None, None, 
+                                                                                            size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  )
 
                                 else:
@@ -472,14 +336,14 @@ class VAE(nn.Module):
                                     mean_1    = result_2["mean_1"].to("cuda:1")
                                     logvar_1  = result_2["logvar_1"].to("cuda:1")
 
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
-                                                                                                  size_factor2, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1, 
+                                                                                            size_factor2, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z) + (args.sf1 * (atten_loss1) ) ) 
 
                             else:
                                 if state == 0 :
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, None, None, None, None, 
-                                                                                                  size_factor1, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, None, None, None, None, 
+                                                                                            size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  ) 
 
                                 else:
@@ -489,8 +353,8 @@ class VAE(nn.Module):
                                     mean_1    = result_2["mean_1"].to("cuda:0")
                                     logvar_1  = result_2["logvar_1"].to("cuda:0")
 
-                                    loss1, _, kl_divergence_z, atten_loss1, _ = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
-                                                                                                  size_factor1, criterion, attention_loss)
+                                    loss1, kl_divergence_z, atten_loss1 = self.return_loss( X1, X1_raw, latent_z1, mean_1, logvar_1, hidden_1, 
+                                                                                            size_factor1, criterion, attention_loss)
                                     test_loss = torch.mean( loss1 +  (kl_weight * kl_divergence_z)  + (args.sf2 * (atten_loss1) ) )
 
                         train_loss_list.append( test_loss.item() )
@@ -533,7 +397,6 @@ class VAE(nn.Module):
         print( 'train likelihood is :  '+ str(test_like_max) + ' epoch: ' + str(reco_epoch_test) )
 
 class DCCA(nn.Module):
-    #def __init__( self, layer_e, hidden1, hidden2, layer_l, layer_d, hidden ):
     def __init__( self, layer_e_1, hidden1_1, Zdim_1, layer_d_1, hidden2_1, 
                   layer_e_2, hidden1_2, Zdim_2, layer_d_2, hidden2_2, args,
                   ground_truth, ground_truth1, Type_1 = 'NB', Type_2 = 'Bernoulli', cycle = 1, 
@@ -543,6 +406,7 @@ class DCCA(nn.Module):
         super(DCCA, self).__init__()
         # cycle indicates the mutual learning, 0 for initiation of model1 with scRNA-seq data, 
         # and odd for training other models, even for scRNA-seq
+
         self.model1 = VAE(layer_e = layer_e_1, hidden1 = hidden1_1, Zdim = Zdim_1, 
                           layer_d = layer_d_1, hidden2 = hidden2_1, n_centroids = n_centroids,
                           Type    = Type_1, penality = penality, droprate = droprate )
@@ -567,6 +431,9 @@ class DCCA(nn.Module):
 
         elif attention_loss == 'KL_div':
             self.attention = KL_diver()
+
+        elif attention_loss == 'L1':
+            self.attention = L1_dis()
 
         else:
             self.attention = Eucli_dis()
@@ -666,6 +533,9 @@ class DCCA(nn.Module):
         kmeans1 = KMeans( n_clusters = self.args.cluster1, n_init = 5, random_state = 200 )
         kmeans2 = KMeans( n_clusters = self.args.cluster2, n_init = 5, random_state = 200 )
 
+        latent_code_rna  = []
+        latent_code_atac = []
+
         ARI_score1, NMI_score1 = -100, -100
         ARI_score2, NMI_score2 = -100, -100
         
@@ -681,26 +551,33 @@ class DCCA(nn.Module):
             result1  = self.model1.inference( X1, size_factor1)
             result2  = self.model2.inference( X2, size_factor2)
 
-            pred_z1    = kmeans1.fit_predict( result1["latent_z1"].data.cpu().numpy() )
-            NMI_score1 = round( normalized_mutual_info_score( self.ground_truth, pred_z1,  average_method='max' ), 3 )
-            ARI_score1 = round( metrics.adjusted_rand_score( self.ground_truth, pred_z1 ), 3 )
+            latent_code_rna.append( result1["latent_z1"].data.cpu().numpy() )
+            latent_code_atac.append( result2["latent_z1"].data.cpu().numpy() )
 
-            pred_z2    = kmeans2.fit_predict( result2["latent_z1"].data.cpu().numpy() )
-            NMI_score2 = round( normalized_mutual_info_score( self.ground_truth1, pred_z2,  average_method='max' ), 3 )
-            ARI_score2 = round( metrics.adjusted_rand_score( self.ground_truth1, pred_z2 ), 3 )
+        latent_code_rna  = np.concatenate(latent_code_rna)
+        latent_code_atac = np.concatenate(latent_code_atac)
 
-            print('ARI score1: ' + str(ARI_score1) + ' NMI score1: ' + str(NMI_score1) + ' ARI score2: ' + str(ARI_score2) + ' NMI score2: ' + str(NMI_score2) )
+        pred_z1    = kmeans1.fit_predict( latent_code_rna )
+        NMI_score1 = round( normalized_mutual_info_score( self.ground_truth, pred_z1,  average_method='max' ), 3 )
+        ARI_score1 = round( metrics.adjusted_rand_score( self.ground_truth, pred_z1 ), 3 )
 
-            return NMI_score1, ARI_score1, NMI_score2, ARI_score2
+        pred_z2    = kmeans1.fit_predict( latent_code_atac )
+        NMI_score2 = round( normalized_mutual_info_score( self.ground_truth, pred_z2,  average_method='max' ), 3 )
+        ARI_score2 = round( metrics.adjusted_rand_score( self.ground_truth, pred_z2 ), 3 )
 
+        print('scRNA-ARI: ' + str(ARI_score1) + ' NMI: ' + str(NMI_score1) + ' scEpigenomics-ARI: ' + str(ARI_score2) + ' NMI: ' + str(NMI_score2) )
+        return NMI_score1, ARI_score1, NMI_score2, ARI_score2
 
-    def forward( self, total_loader = None):
-
-        result1 = None
-        result2 = None
+    def encodeBatch(self, total_loader):
+        # processing large-scale datasets
+        latent_z1 = []
+        latent_z2 = []
+        norm_x1   = []
+        recon_x1  = []
+        norm_x2   = []
+        recon_x2  = []
 
         for batch_idx, ( X1, _, size_factor1, X2, _, size_factor2 ) in enumerate(total_loader): 
-
             if self.args.use_cuda:
                 X1, size_factor1 = X1.to("cuda:0"), size_factor1.to("cuda:0")
                 X2, size_factor2 = X2.to("cuda:1"), size_factor2.to("cuda:1")
@@ -711,5 +588,73 @@ class DCCA(nn.Module):
             result1  = self.model1( X1, size_factor1)
             result2  = self.model2( X2, size_factor2)
 
-        return result1, result2
+            latent_z1.append( result1["latent_z1"].data.cpu().numpy() )
+            latent_z2.append( result2["latent_z1"].data.cpu().numpy() )
+
+            norm_x1.append( result1["norm_x"].data.cpu().numpy() )
+            recon_x1.append( result1["recon_x"].data.cpu().numpy() )
+
+            norm_x2.append( result2["norm_x"].data.cpu().numpy() )
+            recon_x2.append( result2["recon_x"].data.cpu().numpy() )
+
+        latent_z1 = np.concatenate(latent_z1)
+        latent_z2 = np.concatenate(latent_z2)
+        norm_x1   = np.concatenate(norm_x1)
+        recon_x1  = np.concatenate(recon_x1)
+        norm_x2   = np.concatenate(norm_x2)
+        recon_x2  = np.concatenate(recon_x2)
+
+        return latent_z1, latent_z2, norm_x1, recon_x1, norm_x2, recon_x2
+
+    def forward( self, total_loader = None):
+
+        latent_z1, latent_z2, norm_x1, recon_x1, norm_x2, recon_x2 = self.encodeBatch(total_loader)
+
+        return latent_z1, latent_z2, norm_x1, recon_x1, norm_x2, recon_x2
+
+    def encodeBatch_latent(self, total_loader, train_order):
+        # saving latent features of each model at each step
+        latent_z1 = []
+        latent_z2 = []
+
+        for batch_idx, ( X1, _, size_factor1, X2, _, size_factor2 ) in enumerate(total_loader): 
+            if self.args.use_cuda:
+                X1, size_factor1 = X1.to("cuda:0"), size_factor1.to("cuda:0")
+                X2, size_factor2 = X2.to("cuda:1"), size_factor2.to("cuda:1")
+
+            X1, size_factor1 = Variable( X1 ), Variable( size_factor1 )
+            X2, size_factor2 = Variable( X2 ), Variable( size_factor2 )
+
+            result1  = self.model1( X1, size_factor1)
+            result2  = self.model2( X2, size_factor2)
+
+            latent_z1.append( result1["latent_z1"].data.cpu().numpy() )
+            latent_z2.append( result2["latent_z1"].data.cpu().numpy() )
+
+        latent_z1 = np.concatenate(latent_z1)
+        latent_z2 = np.concatenate(latent_z2)
+
+        latent_z11  = pd.DataFrame( latent_z1 ).to_csv( os.path.join( self.save_path, 
+                                    str(self.file_label) + '_scRNA-latent-' + str(train_order) + '.csv' ) ) 
+        latent_z21  = pd.DataFrame( latent_z2 ).to_csv( os.path.join( self.save_path, 
+                                    str(self.file_label) + '_scATAC-latent-' + str(train_order) + '.csv' ) ) 
+
+    def inference_other_from_rna( self, total_loader ):
+
+        self.model1.eval()
+        self.model2.eval()
+
+        for batch_idx, ( X1, _, size_factor1, _, _, _ ) in enumerate(total_loader): 
+
+            if self.args.use_cuda:
+                X1           = X1.to("cuda:0")
+                size_factor1 = size_factor1.to("cuda:0")
+
+            X1, size_factor1 = Variable( X1 ), Variable( size_factor1 )
+
+            result1          = self.model1( X1, size_factor1)
+            latent_z1        = result1['latent_z1'].to("cuda:1")
+            recons_y         = self.model2.decoder( latent_z1 )
+
+        return recons_y.data.cpu().numpy()
 
