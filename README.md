@@ -1,5 +1,9 @@
 # Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data.
 
+![image](https://github.com/cmzuo11/DCCA/blob/main/Example_test/Figure_1.png)
+
+Overview of DCCA model. (A) Given the raw scRNA-seq data (x_i with M variables) or scEpigenomics data (y_i with N variables) as input, the DCCA model learned a coordinated but separate representation for each omics data (z_x and z_y), by mutually supervising each other based on semantic similarity between embeddings, and then reconstructed back to the original dimension as output through a decoder for each omics data. Note: the same cell order for multi-omics data when using attention-transfer as an additional loss is used to ensure the accuracy of the borrowed knowledge from each other. (B) Each low-dimensional embedding (z_x and z_y) for each omics data learned by DCCA can be used for cell visualization and clustering. (C) Aggregated scEpigenomics data (i.e., scATAC-seq) learned by DCCA was used to characterize the TF motif activity of each cell. (D) Transcription regulation was inferred by using correlation analysis and GLR model on both reconstructed data. A detailed description of how to construct a regulation network is given in Methods.
+
 # Installation
 
 DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or later, and torch 1.6.0 or later. The used packages (described by "used_package.txt") for DCCA can be automatically installed.
@@ -15,7 +19,7 @@ DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possibl
 
 ## Input: 
 
-* the raw count data of scRNA-seq and scMethylation data (i.e., binary scATAC-seq data). 
+* the raw count data of scRNA-seq and scEpigenomics data (i.e., binary scATAC-seq data). 
 
 * Row indicates variable (genes and loci), and column indicates sample (cell).
 
@@ -31,13 +35,13 @@ DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possibl
 
 * modify the neural network structure based on the number of selected variables;
 
-* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weight of signal from scRNA-seq data, args.sf2 indicates the the weight of signal from scATAC-seq data. the default value for two parameters is 2. you can adjust them from 1 to 10 by 1.
+* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weight of signal from scRNA-seq to scEpigenomics, args.sf2 indicates the the weight of signal from scEpigenomics to scRNA-seq. the default value for sf1 and sf2 is 2 and 1, respectively. You can adjust them from 1 to 10 by 1.
 
 ## Output:
 
 the output file will be saved for further analysis:
 
-* model_DCCA.pt: saved model for reproducing results.
+* model_DCCA.pth.tar: saved model for reproducing results.
 
 * scRNA-latent.csv: latent features (Zx, joint-learning space) for scRNA-seq data for clustering and visulization.
 
