@@ -1,6 +1,6 @@
 # Deep cross-omics cycle attention (DCCA) model for joint analysis of single-cell multi-omics data.
 
-![image](https://github.com/cmzuo11/DCCA/blob/main/Example_test/Figure_1.png)
+![image](https://github.com/cmzuo11/DCCA/blob/main/Utilities/Figure_1.png)
 
 Overview of DCCA model. (A) Given the raw scRNA-seq data (x_i with M variables) or scEpigenomics data (y_i with N variables) as input, the DCCA model learned a coordinated but separate representation for each omics data (z_x and z_y), by mutually supervising each other based on semantic similarity between embeddings, and then reconstructed back to the original dimension as output through a decoder for each omics data. Note: the same cell order for multi-omics data when using attention-transfer as an additional loss is used to ensure the accuracy of the borrowed knowledge from each other. (B) Each low-dimensional embedding (z_x and z_y) for each omics data learned by DCCA can be used for cell visualization and clustering. (C) Aggregated scEpigenomics data (i.e., scATAC-seq) learned by DCCA was used to characterize the TF motif activity of each cell. (D) Transcription regulation was inferred by using correlation analysis and GLR model on both reconstructed data. A detailed description of how to construct a regulation network is given in Methods.
 
@@ -61,7 +61,8 @@ The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze si
 * Infer_network: infer TF-TG relationship based on two-omics data;
 * ...
 
-[Tutorial](https://github.com/cmzuo11/DCCA/wiki/Tutorial)
+## Tutorial
+[Cell line mixture dataset of SNARE-seq technology by DCCA model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model)
 
 # Reference:
 
