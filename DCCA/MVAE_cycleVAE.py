@@ -90,7 +90,6 @@ class VAE(nn.Module):
                      logvar_1 = logvar_1,  hidden   = hidden
                     )
 
-
     def return_loss(self, X      = None, X_raw       = None, latent_pre        = None, 
                     mean_pre     = None, logvar_pre  = None, latent_pre_hidden = None, 
                     scale_factor = 1.0, cretion_loss = None, attention_loss    = None ):
@@ -134,7 +133,6 @@ class VAE(nn.Module):
                 atten_loss1 = cretion_loss(latent_z1, latent_pre)
 
         return loss, kl_divergence_z, atten_loss1
-
         
     def forward( self, X = None, scale_factor = 1.0 ):
 
@@ -226,7 +224,6 @@ class VAE(nn.Module):
                             loss1, kl_divergence_z, atten_loss1 = self.return_loss( X2, X2_raw, latent_z1, mean_1, logvar_1, hidden_1,
                                                                                     size_factor2, criterion, attention_loss)
                             loss = torch.mean( loss1 + (kl_weight * kl_divergence_z)  + (args.sf1 * (atten_loss1) ) )
-
                 else:
 
                     if cycle%2 == 0:
