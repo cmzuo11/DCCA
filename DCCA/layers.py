@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 30 11:39:39 2019
+Created on Mon Jul 27 17:30:45 2020
 
 @author: chunmanzuo
 """
@@ -58,46 +58,11 @@ def build_multi_layers(layers, use_batch_norm=True, dropout_rate = 0.1 ):
     
     return fc_layers
 
-
 class Encoder(nn.Module):
     
     ## for one modulity
     def __init__(self, layer, hidden, Z_DIMS, droprate = 0.1 ):
         super(Encoder, self).__init__()
-        
-        if len(layer) > 1:
-            self.fc1   =  build_multi_layers( layers = layer , dropout_rate = droprate)
-            
-        self.layer = layer
-        self.fc_means  =  nn.Linear(hidden, Z_DIMS)
-        self.fc_logvar =  nn.Linear(hidden, Z_DIMS)
-        
-    def reparametrize(self, means, logvar):
-
-        if self.training:
-            std = logvar.mul(0.5).exp_()
-            eps = Variable(std.data.new(std.size()).normal_())
-            return eps.mul(std).add_(means)
-        else:
-          return means
-        
-    def forward(self, x):
-
-        if len(self.layer) > 1:
-            h = self.fc1(x)
-        else:
-            h = x
-        mean_x = self.fc_means(h)
-        logvar_x = self.fc_logvar(h)
-        latent = self.reparametrize(mean_x, logvar_x)
-        
-        return mean_x, logvar_x, latent
-
-class Encoder_new(nn.Module):
-    
-    ## for one modulity
-    def __init__(self, layer, hidden, Z_DIMS, droprate = 0.1 ):
-        super(Encoder_new, self).__init__()
         
         if len(layer) > 1:
             self.fc1   =  build_multi_layers( layers = layer, dropout_rate = droprate )
@@ -304,75 +269,3 @@ class Decoder(nn.Module):
             Final_x = recon_x
         
         return Final_x
-
-class Creat_selector_network(nn.Module):
-    
-    ## for one modulity
-    def __init__(self, layer ):
-        super(Creat_selector_network, self).__init__()
-
-        if len(layer) > 1:
-            self.select_net = nn.Sequential(
-                collections.OrderedDict(
-                    [
-                        (
-                            "Layer {}".format(i),
-                            nn.Sequential(
-                                nn.Linear(n_in, n_out),
-                                nn.ReLU(),
-                            ),
-                        )
-
-                        for i, (n_in, n_out) in enumerate( zip(layer[:-1], layer[1:] ) )
-                    ]
-                )
-            )
-
-        self.select_net  = build_multi_layers(layer)
-
-        self.propability = nn.Linear(layer[-1], layer[0])
-        self.layer       = layer
-        
-    def forward(self, x):
-
-        if len(self.layer) > 1:
-            h = self.select_net(x)
-        else:
-            h = x
-
-        sel_pro = torch.sigmoid( self.propability( h ) )
-        
-        return sel_pro
-
-class Creat_prediction_network(nn.Module):
-    
-    ## for one modulity
-    def __init__(self, layer, hidden1, Zdim ):
-        super(Creat_prediction_network, self).__init__()
-
-        self.fc_sub     = build_multi_layers(layer)
-        self.sub_linear = nn.Linear(hidden1, Zdim)
-        
-    def forward(self, x):
-
-        h       = self.fc_sub(x)
-        sel_pro = F.softmax( self.sub_linear( h ), dim = 1  )
-        
-        return sel_pro
-
-def bernoulli_sampling (prob):
-  """ Sampling Bernoulli distribution by given probability.
-  
-  Args:
-    - prob: P(Y = 1) in Bernoulli distribution.
-    
-  Returns:
-    - samples: samples from Bernoulli distribution
-  """  
-
-  n, d       = prob.size()
-  samples    = np.random.binomial(1, prob.data.cpu().numpy(), (n, d))
-
-  return_sam = torch.from_numpy( samples ).cuda()
-        
-  return return_sam
