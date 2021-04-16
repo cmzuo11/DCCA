@@ -62,7 +62,7 @@ The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze si
 * ...
 
 ## Tutorial
-[Cell line mixture dataset of SNARE-seq technology by DCCA model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model)
+Cell line mixture dataset of SNARE-seq technology analysis by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-MOFA-,-scAI,-and-scMVAE-PoE)
 
 # Reference:
 
