@@ -66,6 +66,7 @@ Cell line mixture dataset of SNARE-seq technology by [DCCA model](https://github
 
 PBMC_3K dataset from 10X Genomics by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-MOFA-,-scAI,-and-scMVAE-PoE-model)
 
+mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/scRNA-seq-and-scMethylation-data-from-scNMT-seq-technology-by-DCCA-model)
 
 # Reference:
 
