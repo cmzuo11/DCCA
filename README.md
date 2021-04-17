@@ -68,6 +68,6 @@ PBMC_3K dataset from 10X Genomics by [DCCA model](https://github.com/cmzuo11/DCC
 
 mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/scRNA-seq-and-scMethylation-data-from-scNMT-seq-technology-by-DCCA-model)
 
-# Reference:
+# Reference
 
 Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. 2021. (submitted).
