@@ -39,7 +39,7 @@ DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possibl
 
 ## Output:
 
-the output file will be saved for further analysis:
+### the output file will be saved for further analysis:
 
 * model_DCCA.pth.tar: saved model for reproducing results.
 
@@ -53,7 +53,7 @@ the output file will be saved for further analysis:
 
 ## Further analysis:
 
-The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze single-cell multi-omics data as follows:
+### The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze single-cell multi-omics data as follows:
 
 * Select_Loci_by_vargenes: select the genomics loci based on predefined genes;
 * Plot_umap_embeddings: plot cell embeddings based on each latent feature for each omics data;
