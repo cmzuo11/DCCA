@@ -65,13 +65,13 @@ DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possibl
 * ...
 
 ## Tutorial
-Cell line mixture dataset of SNARE-seq technology by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-MOFA-,-scAI,-and-scMVAE-PoE)
+Cell line mixture dataset of SNARE-seq technology by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-cellMix-dataset-from-SNARE-seq-technology-by-MOFA-,-scAI,-and-scMVAE-PoE)
 
-PBMC_3K dataset from 10X Genomics by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-MOFA-,-scAI,-and-scMVAE-PoE-model)
+PBMC_3K dataset from 10X Genomics by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-PBMC_3K-dataset-from-10X-Genomics-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-MOFA-,-scAI,-and-scMVAE-PoE-model)
 
 mouse_skin dataset from SHARE-seq technology by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-mouse_skin-dataset-from-SHARE-seq-technology-by-DCCA-model), by [MOFA+, scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-mouse_skin-dataset-from-SHARE-seq-technology-by-MOFA--and-scMVAE-PoE-model)
 
-mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/scRNA-seq-and-scMethylation-data-from-scNMT-seq-technology-by-DCCA-model)
+mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-scRNA-seq-and-scMethylation-data-from-scNMT-seq-technology-by-DCCA-model)
 
 # Reference
 
