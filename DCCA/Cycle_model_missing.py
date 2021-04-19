@@ -29,10 +29,10 @@ from torch.nn import functional as F
 
 from torch.distributions import Normal, kl_divergence as kl
 
-from layers import  Encoder, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
-from loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, KL_diver
-from loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis
-from utilities import adjust_learning_rate
+from DCCA.layers import  Encoder, Decoder_logNorm_ZINB, Decoder_logNorm_NB, Decoder
+from DCCA.loss_function import log_zinb_positive, log_nb_positive, binary_cross_entropy, mse_loss, KL_diver
+from DCCA.loss_function import NSTLoss, FactorTransfer, Similarity, Correlation, Attention, Eucli_dis
+from DCCA.utilities import adjust_learning_rate
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
