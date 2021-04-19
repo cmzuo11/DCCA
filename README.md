@@ -59,12 +59,17 @@ The detailed functions (at ./DCCA/Processing_data.R) regarding how to anlayze si
 * Plot_umap_embeddings: plot cell embeddings based on each latent feature for each omics data;
 * Calculate_TF_score: calcucate the TF score for each cell based on input scATAC-seq data;
 * Infer_network: infer TF-TG relationship based on two-omics data;
+* Generate_cell_type_regulon: construct cell-type-specific network;
+* Regulon_activity: calcualte regulon activity for each cell of each cell type;
+* Similarity_coregulated_gene: GO function similarity of co-regulated genes for the same TF;
 * ...
 
 ## Tutorial
 Cell line mixture dataset of SNARE-seq technology by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/cellMix-dataset-from-SNARE-seq-technology-by-MOFA-,-scAI,-and-scMVAE-PoE)
 
 PBMC_3K dataset from 10X Genomics by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-DCCA-model), by [MOFA+, scAI, and scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/PBMC_3K-dataset-from-10X-Genomics-by-MOFA-,-scAI,-and-scMVAE-PoE-model)
+
+mouse_skin dataset from SHARE-seq technology by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-mouse_skin-dataset-from-SHARE-seq-technology-by-DCCA-model), by [MOFA+, scMVAE-PoE model](https://github.com/cmzuo11/DCCA/wiki/Analysis-of-mouse_skin-dataset-from-SHARE-seq-technology-by-MOFA--and-scMVAE-PoE-model)
 
 mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.com/cmzuo11/DCCA/wiki/scRNA-seq-and-scMethylation-data-from-scNMT-seq-technology-by-DCCA-model)
 
