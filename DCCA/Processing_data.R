@@ -664,7 +664,7 @@ reChromName <- function(Names){
   return(temp_names)
 }
 
-Scale_data <- function(devi_data, ymin = 0, ymax = 1){
+Scale_data <- function(devi_data, ymin = 0, ymax = 1, na_rm = F){
   scale_devi = NULL
   for(i in 1:dim(devi_data)[1])
   {
@@ -672,6 +672,10 @@ Scale_data <- function(devi_data, ymin = 0, ymax = 1){
     max_va   = max(devi_data[i,], na.rm = T)
     temp_das = (ymax-ymin)*(devi_data[i,] - min_va)/(max_va-min_va) + ymin
     scale_devi = rbind(scale_devi, temp_das )
+  }
+  if( (na_rm==T) && (length(which(is.na(scale_devi)))>0) )
+  {
+    scale_devi[which(is.na(scale_devi))] = 2
   }
   return(scale_devi)
 }
