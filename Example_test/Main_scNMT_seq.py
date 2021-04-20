@@ -6,21 +6,8 @@
 import numpy as np
 import pandas as pd
 import os
-import time
 import torch
-import math
 import torch.utils.data as data_utils
-from torch.autograd import Variable
-from torch import optim
-from sklearn.cluster import KMeans
-from sklearn import metrics
-from sklearn.metrics import cohen_kappa_score
-from sklearn.metrics.cluster import normalized_mutual_info_score
-
-from sklearn.metrics.pairwise import pairwise_distances
-from sklearn.model_selection import KFold
-
-from random import randint, sample
 
 from DCCA.utilities import read_dataset, normalize, parameter_setting, save_checkpoint, load_checkpoint
 from DCCA.Cycle_model_missing import DCCA_missing
