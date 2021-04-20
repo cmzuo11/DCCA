@@ -15,8 +15,8 @@ from DCCA.MVAE_cycleVAE import DCCA
 def train_with_argas( args ):
 
   args.workdir  =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/SHARE-seq'
-  args.outdir   =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/SHARE-seq/scCycleVAE/'
-  save_model_p  =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/SHARE-seq/scCycleVAE/best_model/'
+  args.outdir   =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/SHARE-seq/DCCA/'
+  save_model_p  =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/SHARE-seq/DCCA/best_model/'
 
   if not os.path.exists( save_model_p ) :
     os.makedirs( save_model_p )
@@ -94,7 +94,7 @@ def train_with_argas( args ):
   if args.use_cuda:
     model.cuda()
 
-  NMI_score1, ARI_score1, NMI_score2, ARI_score2  =  model.fit_model(train_loader, test_loader, total_loader, 'RNA' )
+  NMI_score1, ARI_score1, NMI_score2, ARI_score2  =  model.fit_model(train_loader, test_loader, None, 'RNA' )
 
   save_checkpoint(model, model_file ) 
 
