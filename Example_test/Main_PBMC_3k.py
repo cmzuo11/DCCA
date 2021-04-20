@@ -21,11 +21,11 @@ def train_with_argas( args ):
 
     args.sf1        =  5
     args.sf2        =  1
-    args.cluster1   =  args.cluster2   =  4
+    args.cluster1   =  args.cluster2   =  14
     args.lr1        =  0.01
     args.flr1       =  0.001
-    args.lr2        =  0.005
-    args.flr2       =  0.0005
+    args.lr2        =  0.05
+    args.flr2       =  0.005
 
     args.workdir    =  '/sibcb2/chenluonanlab7/cmzuo/workPath/sc_dl/Multi-model/Datasets/Real/10X/pbmc_unsorted_3k/filtered_feature_bc_matrix/'
     args.outdir     =  '/sibcb2/chenluonanlab7/zuochunman/Software/DCCA_test/'
@@ -41,7 +41,7 @@ def train_with_argas( args ):
                                                                                   File4 = None,
                                                                                   transpose = True, 
                                                                                   test_size_prop = 0.1,
-                                                                                  state = 2 )
+                                                                                  state = 3 )
     adata  = normalize( adata, filter_min_counts=True, 
                         size_factors=True, normalize_input=False, 
                         logtrans_input=True ) 
