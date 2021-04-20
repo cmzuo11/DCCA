@@ -256,10 +256,10 @@ class Decoder(nn.Module):
         if self.Type == "Bernoulli":
             Final_x = torch.sigmoid(recon_x)
 
-        elif self.Type == "Gaussian":
+        elif self.Type == "Gaussian1":
             Final_x = F.softmax( recon_x, dim = 1 )
 
-        elif self.Type == "Gaussian1":
+        elif self.Type == "Gaussian":
             Final_x = torch.sigmoid(recon_x)
             
         elif self.Type == "Gaussian2":
