@@ -6,4 +6,6 @@
 
 'Main_scNMT_seq.py' was used to process mouse_gastrulation dataset;
 
+'Main_Share_seq.py' was used to process mouse_skin dataset;
+
 
