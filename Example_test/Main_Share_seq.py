@@ -86,9 +86,9 @@ def train_with_argas( args ):
   args.sf2       = 1
 
   model =  DCCA( layer_e_1 = [Nfeature1, 1000, 128], hidden1_1 = 128, Zdim_1 = 20, layer_d_1  = [20, 128, 1000],
-                 hidden2_1 = 1000, layer_e_2 = [Nfeature2, 10000, 5000, 1000, 128], hidden1_2 = 128, Zdim_2 = 20,
-                 layer_d_2 = [20], hidden2_2 = 20, args = args, ground_truth = label_ground_truth,
-                 ground_truth1  = label_ground_truth, Type_1 = 'NB', Type_2 = "Bernoulli", cycle = 3, 
+                 hidden2_1 = 1000,        layer_e_2 = [Nfeature2, 10000, 5000, 1000, 128], hidden1_2 = 128, Zdim_2 = 20,
+                 layer_d_2 = [20],        hidden2_2 = 20,     args = args, ground_truth = None,
+                 ground_truth1  = None,      Type_1 = 'NB', Type_2 = "Bernoulli", cycle = 3, 
                  attention_loss = "Eucli", patttern = "Both" )
 
   if args.use_cuda:
