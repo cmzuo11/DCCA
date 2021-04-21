@@ -54,7 +54,7 @@ def parameter_setting():
     parser.add_argument('--eps', type=float, default = 0.01, help='eps')
 
     parser.add_argument('--sf1', type=float, default = 2.0, help='scale_factor_1 for supervision signal from scRNA-seq')
-    parser.add_argument('--sf2', type=float, default = 2.0, help='scale_factor_2 for supervision signal from scEpigenomics')
+    parser.add_argument('--sf2', type=float, default = 1.0, help='scale_factor_2 for supervision signal from scEpigenomics')
     parser.add_argument('--cluster1', '-clu1', type=int, default=2, help='predefined cluster for scRNA')
     parser.add_argument('--cluster2', '-clu2', type=int, default=2, help='predefined cluster for other epigenomics')
     parser.add_argument('--geneClu', '-gClu', type=list, default = None, help='predefined gene cluster for scRNA')
@@ -104,20 +104,16 @@ def read_dataset( File1 = None, File2 = None, File3 = None, File4 = None, transp
 
     if state == 0 :
         if File3 is not None:
-            Data2 = pd.read_csv( File3, header=0, index_col=0 )
-            group = Data2['Group'].values
-            for g in group:
-                g = int(g.split('Group')[1])
-                label_ground_truth.append(g)
+            Data2  = pd.read_csv( File3, header=0, index_col=0 )
+            label_ground_truth =  Data2['Group'].values
+
         else:
             label_ground_truth =  np.ones( len( adata.obs_names ) )
 
         if File4 is not None:
             Data2 = pd.read_csv( File4, header=0, index_col=0 )
-            group = Data2['Group'].values
-            for g in group:
-                g = int(g.split('Group')[1])
-                label_ground_truth1.append(g)
+            label_ground_truth1 = Data2['Group'].values
+
         else:
             label_ground_truth1 =  np.ones( len( adata.obs_names ) )
 
@@ -133,6 +129,20 @@ def read_dataset( File1 = None, File2 = None, File3 = None, File4 = None, transp
             label_ground_truth1 = Data2['cell_line'].values
         else:
             label_ground_truth1 =  np.ones( len( adata.obs_names ) )
+
+    elif state == 3:
+        if File3 is not None:
+            Data2 = pd.read_table( File3, header=0, index_col=0 )
+            label_ground_truth = Data2['Group'].values
+        else:
+            label_ground_truth =  np.ones( len( adata.obs_names ) )
+
+        if File4 is not None:
+            Data2 = pd.read_table( File4, header=0, index_col=0 )
+            label_ground_truth1 = Data2['Group'].values
+        else:
+            label_ground_truth1 =  np.ones( len( adata.obs_names ) )
+
     else:
         if File3 is not None:
             Data2 = pd.read_table( File3, header=0, index_col=0 )
@@ -205,6 +215,7 @@ def normalize( adata, filter_min_counts=True, size_factors=True,
 
     return adata
 
+
 def calculate_log_library_size( Dataset ):
     ### Dataset is raw read counts, and should be cells * features
     Nsamples     =  np.shape(Dataset)[0]
@@ -223,12 +234,10 @@ def adjust_learning_rate(init_lr, optimizer, iteration, max_lr, adjust_epoch):
 
     return lr   
 
-def save_checkpoint(model, filename='model_best.pth.tar', folder='./saved_model/'):
 
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
+def save_checkpoint(model, filename='model_best.pth.tar' ):
 
-    torch.save(model.state_dict(), os.path.join(folder, filename))
+    torch.save( model.state_dict(), filename )
 
 
 def load_checkpoint(file_path, model, use_cuda=False):
@@ -275,3 +284,48 @@ def estimate_cluster_numbers(data):
         if evals[i] > bd:
             k += 1
     return k
+
+def pearson(data):
+    print('Start for pearson similarity ')
+    df    = pd.DataFrame(data.T)
+    pear_ = df.corr(method='pearson')
+    return np.where(pear_>=0, pear_, np.zeros(shape=(pear_.shape)))
+
+def LaplacianScore(x, w):
+    # x in (samples, features)
+    n_samples, n_feat = x.shape[0], x.shape[1]
+
+    if w.shape[0] != n_samples:
+        raise Exception("W.shape not match X.shape")
+
+    D = np.diag(np.sum(w, axis=1)) # (n_samples,)
+    D2 = np.sum(w, axis=1) # (n_samples,)
+    L = w
+
+    tmp1 = (D2.T).dot(x)
+    DPrime = np.sum((x.T.dot(D)).T * x, axis=0) - tmp1 * tmp1/np.sum(D2)
+    LPrime = np.sum((x.T.dot(L)).T * x, axis=0) - tmp1 * tmp1/np.sum(D2)
+
+    DPrime = eps2C(DPrime, c=10000)
+    a1=np.sum(D)
+    a2=np.sum((x.T.dot(D)).T * x, axis=0)
+    a3=tmp1 * tmp1/np.sum(D)
+    a4=(x.T.dot(D)).T * x
+    a7=((x.T).dot(D)).T * x
+    a5=tmp1 * tmp1
+    a6=x.T.dot(D)
+    a9=np.dot(x.T,D)
+
+    Y = LPrime / DPrime
+    #Y = Y.T#lzl edit
+    return Y
+
+def Feature_selection_by_Laplace( fileName, outName):
+    ### here, fileName is sample * feature
+    print('For similarity pearson')
+
+    Data         = pd.read_table( fileName, header=0, index_col=0 )
+    pear_sim0    = pearson(Data)
+    pear_score   = LaplacianScore(Data, pear_sim0)
+
+    return pear_score
