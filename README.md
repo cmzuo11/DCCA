@@ -35,7 +35,7 @@ DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possibl
 
 * modify the neural network structure based on the number of selected variables;
 
-* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weight of signal from scRNA-seq to scEpigenomics, args.sf2 indicates the the weight of signal from scEpigenomics to scRNA-seq. the default value for sf1 and sf2 is 5 and 1, respectively. You can adjust them from 1 to 10 by 1.
+* modify the trade-off paramters between the latent feature representing information of each omics data and supervision signal from other omcis data. i.e., sf1    indicates the the weight of signal from scRNA-seq to scEpigenomics, args.sf2 indicates the the weight of signal from scEpigenomics to scRNA-seq. the default value for sf1 and sf2 is 5 and 1, respectively. You can adjust them from 1 to 10 by 2.
 
 ## Output:
 
