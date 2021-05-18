@@ -75,4 +75,4 @@ mouse_gastrulation from scNMT-seq technologyby by [DCCA model](https://github.co
 
 # Reference
 
-Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. 2021. (submitted).
+Chunman Zuo, Hao Dai, Luonan Chen. Deep cross-omics cycle attention model for joint analysis of single-cell multi-omics data. Bioinformatics. 2021. (Accepted).
