@@ -6,7 +6,7 @@ Overview of DCCA model. (A) Given the raw scRNA-seq data (x_i with M variables) 
 
 # Installation
 
-DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12 or later, and torch 1.6.0 or later. The used packages (described by "used_package.txt") for DCCA can be automatically installed.
+DCCA is implemented in the Pytorch framework. Please run DCCA on CUDA if possible. DCCA requires python 3.6.12, and torch 1.6.0. The used packages (described by "used_package.txt") for DCCA can be automatically installed.
 
 * git clone git://github.com/cmzuo11/DCCA.git
 
